@@ -10,7 +10,7 @@
       "value": "networkInterfaceName-"
     },
     "vmname": {
-      "value": "vm-"
+      "value": "vm"
     },
     "vmsize": {
       "value": "Standard_B1s"

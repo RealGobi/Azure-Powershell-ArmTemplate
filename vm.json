@@ -74,7 +74,7 @@
                 "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('uniquePublicIpName'))]"
               },
               "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'jimmy-AA-Resource', 'default')]"
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'jimmy-AA-Resource-vnet', 'default')]"
               }
             }
           }
