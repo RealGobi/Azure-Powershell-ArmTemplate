@@ -1,0 +1,96 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {},
+  "functions": [],
+  "variables": {},
+  "resources": [
+
+    {
+      "name": "js-test-aswexc-PublicIP",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2019-11-01",
+      "location": "[resourceGroup().location]",
+      "tags": {
+        "displayName": "PublicIPAddress"
+      },
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic",
+        "dnsSettings": {
+          "domainNameLabel": "[toLower('js-test-aswexc')]"
+        }
+      }
+    },
+    {
+      "name": "js-test-aswexc-NetworkInterface",
+      "type": "Microsoft.Network/networkInterfaces",
+      "apiVersion": "2019-11-01",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', 'js-test-aswexc-PublicIP')]"
+      ],
+      "tags": {
+        "displayName": "js-test-aswexc Network Interface"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipConfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'js-test-aswexc-PublicIP')]"
+              },
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'jimmy-AA-Resource-vnet', 'default')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "js-test-aswexc",
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "2019-07-01",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkInterfaces', 'js-test-aswexc-NetworkInterface')]"
+      ],
+      "tags": {
+        "displayName": "js-test-aswexc"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "Standard_B1s"
+        },
+        "osProfile": {
+          "computerName": "js-test-aswexc",
+          "adminUsername": "adminUsername",
+          "adminPassword": "Ma5!bjkjl"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "MicrosoftWindowsServer",
+            "offer": "WindowsServer",
+            "sku": "2012-R2-Datacenter",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "js-test-aswexcOSDisk",
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', 'js-test-aswexc-NetworkInterface')]"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "outputs": {}
+}
