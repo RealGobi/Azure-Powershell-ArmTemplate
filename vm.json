@@ -1,13 +1,48 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
-  "parameters": {},
+  "parameters": {
+    "PublicIPName": {
+      "type": "string"
+    },
+    "networkInterfaceName": {
+      "type": "string"
+    },
+    "vmname": {
+      "type": "string"
+    },
+    "vmsize": {
+      "defaultValue": "Standard_B1s",
+      "allowedValues": [
+        "Standard_B1s",
+        "Standard_B1ls"
+      ],
+      "type": "string"
+    },
+    "adminUsername": {
+      "type": "string"
+    },
+    "adminPassword": {
+      "type": "securestring"
+    },
+    "osDiskName": {
+      "type": "string"
+    },
+    "ipConfigName": {
+      "type": "string"
+    }
+  },
   "functions": [],
-  "variables": {},
+    "variables": {
+    "uniqueVmName": "[concat(parameters('vmname'), uniqueString(resourceGroup().id))]",
+    "uniquePublicIpName": "[concat(parameters('PublicIPName'), uniqueString(resourceGroup().id))]",
+    "networkInterfaceName": "[concat(parameters('networkInterfaceName'), uniqueString(resourceGroup().id))]",
+    "osDiskName": "[concat(parameters('osDiskName'), uniqueString(resourceGroup().id))]",
+    "ipConfigName": "[concat(parameters('ipConfigName'), uniqueString(resourceGroup().id))]"
+  },
   "resources": [
-
     {
-      "name": "js-test-aswexc-PublicIP",
+      "name": "[variables('uniquePublicIpName')]",
       "type": "Microsoft.Network/publicIPAddresses",
       "apiVersion": "2019-11-01",
       "location": "[resourceGroup().location]",
@@ -17,32 +52,29 @@
       "properties": {
         "publicIPAllocationMethod": "Dynamic",
         "dnsSettings": {
-          "domainNameLabel": "[toLower('js-test-aswexc')]"
+          "domainNameLabel": "[toLower(variables('uniquePublicIpName'))]"
         }
       }
     },
     {
-      "name": "js-test-aswexc-NetworkInterface",
+      "name": "[variables('networkInterfaceName')]",
       "type": "Microsoft.Network/networkInterfaces",
       "apiVersion": "2019-11-01",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/publicIPAddresses', 'js-test-aswexc-PublicIP')]"
+        "[resourceId('Microsoft.Network/publicIPAddresses', variables('uniquePublicIpName'))]"
       ],
-      "tags": {
-        "displayName": "js-test-aswexc Network Interface"
-      },
       "properties": {
         "ipConfigurations": [
           {
-            "name": "ipConfig1",
+            "name": "[variables('ipConfigName')]",
             "properties": {
               "privateIPAllocationMethod": "Dynamic",
               "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'js-test-aswexc-PublicIP')]"
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('uniquePublicIpName'))]"
               },
               "subnet": {
-                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'jimmy-AA-Resource-vnet', 'default')]"
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'jimmy-AA-Resource', 'default')]"
               }
             }
           }
@@ -50,24 +82,24 @@
       }
     },
     {
-      "name": "js-test-aswexc",
+      "name": "[variables('uniqueVmName')]",
       "type": "Microsoft.Compute/virtualMachines",
       "apiVersion": "2019-07-01",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[resourceId('Microsoft.Network/networkInterfaces', 'js-test-aswexc-NetworkInterface')]"
+        "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
       ],
       "tags": {
-        "displayName": "js-test-aswexc"
+        "displayName": "[variables('uniqueVmName')]"
       },
       "properties": {
         "hardwareProfile": {
-          "vmSize": "Standard_B1s"
+          "vmSize": "[parameters('vmsize')]"
         },
         "osProfile": {
-          "computerName": "js-test-aswexc",
-          "adminUsername": "adminUsername",
-          "adminPassword": "Ma5!bjkjl"
+          "computerName": "[variables('uniqueVmName')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
         },
         "storageProfile": {
           "imageReference": {
@@ -77,7 +109,7 @@
             "version": "latest"
           },
           "osDisk": {
-            "name": "js-test-aswexcOSDisk",
+            "name": "[variables('osDiskName')]",
             "caching": "ReadWrite",
             "createOption": "FromImage"
           }
@@ -85,7 +117,7 @@
         "networkProfile": {
           "networkInterfaces": [
             {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', 'js-test-aswexc-NetworkInterface')]"
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
             }
           ]
         }

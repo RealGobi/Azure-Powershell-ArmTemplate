@@ -1,0 +1,31 @@
+
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "PublicIPName": {
+      "value": "publicIp-"
+    },
+    "networkInterfaceName": {
+      "value": "networkInterfaceName-"
+    },
+    "vmname": {
+      "value": "vm-"
+    },
+    "vmsize": {
+      "value": "Standard_B1s"
+    },
+    "adminUsername": {
+      "value": "Adminadmin1"
+    },
+    "adminPassword": {
+      "value": "1nimdanimdA"
+    },
+    "osDiskName": {
+      "value": "osDiskName-"
+    },
+    "ipConfigName": {
+      "value": "ipConfigName-"
+    }
+  }
+}
